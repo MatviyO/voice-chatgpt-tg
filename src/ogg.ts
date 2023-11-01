@@ -1,5 +1,5 @@
 import axios from "axios";
-import {createWriteStream} from "fs";
+import {createWriteStream, mkdirSync} from "fs";
 import {dirname} from "path";
 import {fileURLToPath, resolve} from "url";
 // core
@@ -16,18 +16,23 @@ class OggConverter {
         ffmpeg.setFfmpegPath(installer.path);
     }
 
-    toMp3(url: string, fileName: string): Promise<string> {
+    toMp3(inputFilePath: string, outputFilePath: string): Promise<string> {
         try {
-            const outputPath = resolve(dirname(url), `${fileName}.mp3`);
-            return new Promise((resolve, reject) =>  {
-                ffmpeg(url).inputOptions("-t 30").output(outputPath)
-                    .on("end", () => {
-                        removeFile(url);
-                        resolve(outputPath)
+            return new Promise((resolve, reject) => {
+                ffmpeg()
+                    .input(inputFilePath)
+                    .inputOptions('-t 30') // Trim the input to 30 seconds
+                    .audioCodec('libmp3lame') // Use MP3 codec
+                    .toFormat('mp3') // Set the output format to MP3
+                    .on('end', () => {
+                        removeFile(inputFilePath);
+                        resolve(`/Users/admin/Github/voice-chatgpt-tg/${outputFilePath}.mp3`); // Resolve with the output file path
                     })
-                    .on("error", (e) => reject(e.message))
-                    .run();
-            })
+                    .on('error', (err) => {
+                        reject(`FFmpeg error: ${err}`);
+                    })
+                    .save(`/Users/admin/Github/voice-chatgpt-tg/${outputFilePath}.mp3`); // Specify the output file path
+            });
         } catch (e) {
             console.log("Error toMp3", e);
         }
@@ -35,7 +40,7 @@ class OggConverter {
 
     async create(url: string, fileName: string): Promise<string> {
         try {
-            const oggPath = resolve(__dirname, `../voices/${fileName}.ogg`)
+            const oggPath = resolve(__dirname, `${fileName}.ogg`)
             const response = await axios({
                 method: 'get',
                 url,

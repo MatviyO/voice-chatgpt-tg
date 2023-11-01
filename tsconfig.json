@@ -4,4 +4,8 @@
     "moduleResolution": "Node",
     "allowSyntheticDefaultImports": true
   },
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  }
 }
