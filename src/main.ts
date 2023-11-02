@@ -21,6 +21,8 @@ bot.on(message('text'), async (ctx) => {
 })
 
 bot.on(message('voice'), async (ctx) => {
+    // @ts-ignore
+    ctx?.session = initSession;
     try {
         await ctx.reply(code("Waiting..."));
         const link = await ctx.telegram.getFileLink(ctx.message.voice.file_id);
@@ -31,14 +33,39 @@ bot.on(message('voice'), async (ctx) => {
         const text = await openAI.transcription(mp3Path);
         await ctx.reply(code(`Your request: ${text}`));
 
-        const messages = [{ role: openAI.roles.USER, content: text}]
-        const responseAi = await openAI.chat(messages);
+        // @ts-ignore
+        ctx?.session?.messages?.push({ role: openAI.roles.USER, content: text});
+        // @ts-ignore
+        const responseAi = await openAI.chat(ctx?.session?.messages);
+        // @ts-ignore
+        ctx?.session?.messages?.push({ role: openAI.roles.ASSYSTANT, content: responseAi?.content});
         await ctx.reply(String(responseAi?.content));
 
     } catch (e) {
         console.log(`Error voice message`, e)
     }
 })
+
+
+bot.on(message('text'), async (ctx) => {
+    // @ts-ignore
+    ctx?.session = initSession;
+    try {
+        await ctx.reply(code("Waiting..."));
+
+        // @ts-ignore
+        ctx?.session?.messages?.push({ role: openAI.roles.USER, content: ctx.message.text});
+        // @ts-ignore
+        const responseAi = await openAI.chat(ctx?.session?.messages);
+        // @ts-ignore
+        ctx?.session?.messages?.push({ role: openAI.roles.ASSYSTANT, content: responseAi?.content});
+        await ctx.reply(String(responseAi?.content));
+
+    } catch (e) {
+        console.log(`Error voice message`, e)
+    }
+})
+
 
 // handle input command
 bot.command('start', async (ctx) => {

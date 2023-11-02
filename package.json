@@ -7,8 +7,8 @@
   "scripts": {
     "watch": "nodemon -e ts -w ./src -x npm run watch:serve",
     "watch:serve": "ts-node --inspect src/index.ts",
-    "dev": "nodemon ./src/main.ts",
-    "start": "ts-node ./src/main.ts",
+    "dev": "cross-env NODE_ENV=development nodemon ./src/main.ts",
+    "start": "cross-env NODE_ENV=production ts-node ./src/main.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
