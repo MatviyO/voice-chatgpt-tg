@@ -4,6 +4,7 @@ import {code} from "telegraf/format";
 import {Telegraf, session} from "telegraf";
 import {ogg} from "./ogg";
 import { openAI } from "./openAI";
+import { textConvertor } from "./TextConvertor";
 
 
 const initSession = {
@@ -59,8 +60,12 @@ bot.on(message('text'), async (ctx) => {
         const responseAi = await openAI.chat(ctx?.session?.messages);
         // @ts-ignore
         ctx?.session?.messages?.push({ role: openAI.roles.ASSYSTANT, content: responseAi?.content});
-        await ctx.reply(String(responseAi?.content));
 
+        //if we want response audio
+        const source = await textConvertor.textToSpeach(responseAi?.content);
+        // ctx.sendAudio({source})
+
+        await ctx.reply(String(responseAi?.content));
     } catch (e) {
         console.log(`Error voice message`, e)
     }
