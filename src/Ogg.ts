@@ -56,6 +56,17 @@ class OggConverter {
         }
 
     }
+
+    async convertOggToMp3(href: string, userId: string): Promise<string> {
+        try {
+            const oggPath = await ogg.create(href, userId);
+            const mp3Path = await ogg.toMp3(oggPath, userId);
+            return mp3Path;
+        } catch (e) {
+            console.log("Error convertOggToMp3", e);
+        }
+
+    }
 }
 
 export const ogg = new OggConverter()

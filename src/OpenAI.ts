@@ -45,6 +45,9 @@ class OpenAIModule {
         }
     }
 
+    async textToSpeach(text: string) {
+    }
+
 }
 
 export const openAI = new OpenAIModule(config.get("AI_API_KEY"));

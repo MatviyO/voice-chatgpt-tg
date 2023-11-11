@@ -6,6 +6,8 @@ import axios from "axios";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+
+// google api convertor to speach
 class TextConvertor {
 
     generateToken(key: any) {
